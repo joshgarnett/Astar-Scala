@@ -1,26 +1,61 @@
 package com.adverserealms.astar.core
 
 class DataTile(target:AstarTile) {
+  
+  private val STANDARD_COST:Double = 1
 
-  /**
-   * g
-   */
-  private var heuristicValue : Double = 0
+  //reference http://en.wikipedia.org/wiki/A*
   
   /**
-   * h
+   * Cost from start along best known path.
    */
-  private var totalCostToThisTile :Double = 0
-  
-  private var multiplier : Double = 1
-  
-  private var standardCost : Double = 1
+  private var g:Double = 0
   
   /**
-   * f
+   * Heuristic Cost Estimate
    */
-  def getTotalCost() : Double = {
-    return heuristicValue + totalCostToThisTile
+  private var h:Double = 0
+  
+  /**
+   * Estimated total cost from start to goal through y
+   */
+  private var f:Double = 0
+  
+  private var open:Boolean = false
+  private var closed:Boolean = false
+  private var parent:AstarTile = null
+  private var multiplier:Double = 1
+  
+  def getTarget = target
+  
+  def getG = g
+  def setG(value:Double) = {
+    g = value + getCost
+    f = h + g
+  }
+  
+  def getH = h
+  def setH(value:Double) = {
+    h = value
+    f = h + g
+  }
+  
+  def getF = f
+  
+  def getOpen = open
+  def setOpen(value:Boolean) = { open = value }
+  
+  def getClosed = closed
+  def setClosed(value:Boolean) = { closed = value }
+  
+  def getParent = parent
+  def setParent(value:AstarTile) = { parent = value }
+  
+  /**
+   * Sets the distance from this tile to its parent
+   */
+  def setDistance(distance:Double) = {
+    multiplier = distance
   }
   
   def getCost() : Double = {
@@ -28,7 +63,11 @@ class DataTile(target:AstarTile) {
       target.asInstanceOf[CostTile].getCost() * multiplier
     }
     else {
-      standardCost * multiplier
+      STANDARD_COST * multiplier
     }
+  }
+  
+  def calculateUpdateF(parentCost:Double) : Double = {
+    getCost + parentCost + h
   }
 }
