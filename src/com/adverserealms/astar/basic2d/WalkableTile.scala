@@ -20,32 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package com.adverserealms.astar.core
+package com.adverserealms.astar.basic2d
 
-/**
- * The Analyzer class describes searching constraints for the Astar class.
- */
-trait Analyzer {
+trait WalkableTile {
 
   /**
-   * Used to validate a single tile. This method is used to see if the 
-   * start/end tile is a valid tile.
-   * 
-   * @param mainTile The tile that is being analyzed
-   * @param req The path request that is currently being executed
-   * 
-   * @return A boolean indicating whether or not the tile is valid
+   * Returns if the tile is walkable or not
    */
-  def analyzeTile(mainTile:AstarTile, req:PathRequest) : Boolean
-  
-  /**
-   * Eliminates neighbors from the given array and returns the neighbors that were valid.
-   * 
-   * @param mainTile The tile who's neighbors are being analyzed
-   * @param neighbors A list consisting of all the neighbors of the mainTile
-   * @param request The PathRequest that is currently being executed
-   * 
-   * @return A list consisting of all the neighbors that passed this analyzer
-   */
-  def analyze(mainTile:AstarTile, neighbors:List[AstarTile], request:PathRequest) : List[AstarTile]
+  def getWalkable() : Boolean
 }

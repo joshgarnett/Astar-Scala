@@ -1,5 +1,5 @@
 An A* (Astar) library for Scala/Java
 
-This is a direct port of the AS3 code created by Jeroen Beckers at http://www.dauntless.be/astar/
+This is a port of the AS3 code created by Jeroen Beckers at http://www.dauntless.be/astar/
 
 This was developed while working at Kixeye http://www.kixeye.com
