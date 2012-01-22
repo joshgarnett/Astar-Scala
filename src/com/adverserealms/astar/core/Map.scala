@@ -26,6 +26,7 @@ package com.adverserealms.astar.core
  * Defines an interface for maps to be used with the Astar class
  */
 trait Map {
+  
   /**
    * Returns a Vector list of IAstarTiles that are neighbors of the given IAstarTile
    */

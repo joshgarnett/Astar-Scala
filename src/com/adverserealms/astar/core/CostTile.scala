@@ -23,29 +23,12 @@ THE SOFTWARE.
 package com.adverserealms.astar.core
 
 /**
- * The Analyzer class describes searching constraints for the Astar class.
+ * A trait for a tile that has a cost
  */
-trait Analyzer {
+trait CostTile {
 
   /**
-   * Used to validate a single tile. This method is used to see if the 
-   * start/end tile is a valid tile.
-   * 
-   * @param mainTile The tile that is being analyzed
-   * @param req The path request that is currently being executed
-   * 
-   * @return A boolean indicating whether or not the tile is valid
+   * Returns the cost for this tile
    */
-  def analyzeTile(mainTile:AstarTile, req:PathRequest) : Boolean
-  
-  /**
-   * Eliminates neighbors from the given array and returns the neighbors that were valid.
-   * 
-   * @param mainTile The tile who's neighbors are being analyzed
-   * @param neighbours A list consisting of all the neighbors of the mainTile
-   * @param request The PathRequest that is currently being executed
-   * 
-   * @return A list consisting of all the neighbors that passed this analyzer
-   */
-  def analyze(mainTile:AstarTile, allNeighbors:List[AstarTile], request:PathRequest) : List[AstarTile]
+  def getCost() : Double
 }
