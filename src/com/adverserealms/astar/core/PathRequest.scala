@@ -22,6 +22,9 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
+/*
+ * The PathRequest class describes a request to be handled by the Astar class.
+ */
 class PathRequest(start:AstarTile, end:AstarTile, map:Map, priority:Int = 10) {
 
   /**
