@@ -27,6 +27,4 @@ package com.adverserealms.astar.core
  * 
  * Since this is a marker trait, no actual methods have to be implemented.
  */
-trait AstarTile {
-
-}
+trait AstarTile {}
