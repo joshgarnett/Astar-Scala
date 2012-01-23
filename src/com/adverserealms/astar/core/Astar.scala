@@ -24,17 +24,26 @@ package com.adverserealms.astar.core
 
 import akka.actor._
 import akka.actor.Actor._
+import scala.collection.mutable.HashMap
 
 /**
  * The main search algorithm and core class of the Astar library
  */
 class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
 
+  private val dataTiles = new HashMap[AstarTile, DataTile]()
+  
   def receive = {
     case req:AstarPathRequest =>
-      //do something
+      getPath(req)
     case _ =>
+      self.channel ! AstarPathError("Invalid message sent to Astar", null)
       
+  }
+  
+  private def getPath(request:AstarPathRequest) = {
+    //clear any values in the dataTiles HashMap
+    dataTiles.clear()
   }
 }
 

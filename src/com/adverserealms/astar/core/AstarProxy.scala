@@ -5,9 +5,12 @@ import akka.actor.Actor._
 
 class AstarProxy(listener: (Any) => Unit, safeMode:Int) extends Actor {
   
-  //instantiate an Astar actor instance for each path request
-  //To conserve resources and improve performance we may want
-  //to eventually migrate this to an Actor Pool
+  /**
+   * Instantiate an Astar actor instance for each path request
+   * 
+   * TODO: To conserve resources and improve performance we may 
+   * want to eventually migrate this to an Actor Pool
+   */
   private lazy val astar = actorOf(new Astar(safeMode)).start
   
   private var request:AstarPathRequest = null
