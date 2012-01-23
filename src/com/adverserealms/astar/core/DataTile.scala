@@ -3,8 +3,6 @@ package com.adverserealms.astar.core
 class DataTile(target:AstarTile) {
   
   private val STANDARD_COST:Double = 1
-
-  //reference http://en.wikipedia.org/wiki/A*
   
   /**
    * Cost from start along best known path.

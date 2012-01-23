@@ -22,6 +22,49 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
-class Astar {
+import akka.actor._
+import akka.actor.Actor._
 
+/**
+ * The main search algorithm and core class of the Astar library
+ */
+class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
+
+  def receive = {
+    case req:PathRequest =>
+      //do something
+    case _ =>
+      
+  }
+}
+
+object Astar {
+  /**
+   * If Astar.safeMode is set to NORMAL_CHECK, the end tile will be
+   * validated with the analyzer.analyzeTile call.  Only the end
+   * tile is checked.  It is assumed you start from a valid position.
+   */
+  val NORMAL_CHECK:Int = 0
+  
+  /**
+   * If Astar.safeMode is seto to NO_CHECK, nothing will be checked
+   * at the start of the search.
+   */
+  val NO_CHECK:Int = 1
+  
+  /**
+   * This should be called at the start of the application
+   */
+  def initialize() = {
+    val actor = actorOf[Astar]
+    actor.start
+  }
+  
+  /**
+   * This should be called at the end of the application
+   */
+  def cleanup() = {
+    val actor = actorOf[Astar]
+    actor.stop
+  }
 }
