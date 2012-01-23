@@ -36,7 +36,7 @@ trait Analyzer {
    * 
    * @return A boolean indicating whether or not the tile is valid
    */
-  def analyzeTile(mainTile:AstarTile, req:PathRequest) : Boolean
+  def analyzeTile(mainTile:AstarTile, req:AstarPathRequest) : Boolean
   
   /**
    * Eliminates neighbors from the given array and returns the neighbors that were valid.
@@ -47,5 +47,5 @@ trait Analyzer {
    * 
    * @return A list consisting of all the neighbors that passed this analyzer
    */
-  def analyze(mainTile:AstarTile, neighbors:List[AstarTile], request:PathRequest) : List[AstarTile]
+  def analyze(mainTile:AstarTile, neighbors:List[AstarTile], request:AstarPathRequest) : List[AstarTile]
 }

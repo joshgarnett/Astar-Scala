@@ -22,36 +22,8 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
-/*
- * The PathRequest class describes a request to be handled by the Astar class.
- */
-class PathRequest(start:AstarTile, end:AstarTile, map:Map, priority:Int = 10) {
+case class AstarPathRequest(start:AstarTile, end:AstarTile, map:Map)
 
-  /**
-   * Returns the start point of this request
-   */
-  def getStart = start
-  
-  /**
-   * returns the end point of this request
-   */
-  def getEnd = end
-  
-  /**
-   * Returns the map of this request
-   */
-  def getMap = map
-  
-  /**
-   * Returns the priority of this request
-   */
-  def getPriority = priority
-  
-  /**
-   * Returns true if the given tile is a target tile. Returns false otherwise. 
-   * A* will stop searching if it find this tile as the best tile.
-   */
-  def isTarget(tile:AstarTile) : Boolean = {
-    tile == end
-  }
-}
+case class AstarPathResponse(found:Boolean, request:AstarPathRequest, path:AstarPath = null)
+
+case class AstarPathError(message:String, request:AstarPathRequest)

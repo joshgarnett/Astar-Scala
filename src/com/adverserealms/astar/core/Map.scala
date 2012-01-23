@@ -35,7 +35,7 @@ trait Map {
   /**
    * Returns the heuristic for the given tile and the given PathRequest.
    */
-  def getHeuristic(tile:AstarTile, req:PathRequest) : Double
+  def getHeuristic(tile:AstarTile, req:AstarPathRequest) : Double
   
   /**
    * Returns the distance for the given two tiles.

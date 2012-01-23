@@ -31,7 +31,7 @@ import akka.actor.Actor._
 class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
 
   def receive = {
-    case req:PathRequest =>
+    case req:AstarPathRequest =>
       //do something
     case _ =>
       
@@ -39,6 +39,7 @@ class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
 }
 
 object Astar {
+  
   /**
    * If Astar.safeMode is set to NORMAL_CHECK, the end tile will be
    * validated with the analyzer.analyzeTile call.  Only the end
@@ -47,24 +48,18 @@ object Astar {
   val NORMAL_CHECK:Int = 0
   
   /**
-   * If Astar.safeMode is seto to NO_CHECK, nothing will be checked
+   * If Astar.safeMode is set to NO_CHECK, nothing will be checked
    * at the start of the search.
    */
   val NO_CHECK:Int = 1
   
   /**
-   * This should be called at the start of the application
+   * Static method for finding an Astar path.  It will automatically
+   * instantiate actors needed for asynchronous processing and will
+   * clean them up.
    */
-  def initialize() = {
-    val actor = actorOf[Astar]
-    actor.start
-  }
-  
-  /**
-   * This should be called at the end of the application
-   */
-  def cleanup() = {
-    val actor = actorOf[Astar]
-    actor.stop
+  def getPath(path:AstarPathRequest, listener: (Any) => Unit, safeMode:Int = Astar.NORMAL_CHECK) = {
+    val proxy = actorOf(new AstarProxy(listener, safeMode)).start
+    proxy ! path
   }
 }

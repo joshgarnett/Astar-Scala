@@ -27,7 +27,7 @@ import scala.collection.mutable.ListBuffer
 import com.adverserealms.astar.basic2d.WalkableTile
 import com.adverserealms.astar.core.Analyzer
 import com.adverserealms.astar.core.AstarTile
-import com.adverserealms.astar.core.PathRequest
+import com.adverserealms.astar.core.AstarPathRequest
 
 /**
  * The WalkableAnalyzer eliminates tiles that aren't walkable. If ignoreEnd is 
@@ -35,8 +35,8 @@ import com.adverserealms.astar.core.PathRequest
  */
 class WalkableAnalyzer(ignoreEnd:Boolean) extends Analyzer {
 
-  def analyzeTile(mainTile:AstarTile, request:PathRequest) : Boolean = {
-    if(ignoreEnd && request.isTarget(mainTile)) {
+  def analyzeTile(mainTile:AstarTile, request:AstarPathRequest) : Boolean = {
+    if(ignoreEnd && mainTile == request.end) {
       true
     }
     else {
@@ -44,11 +44,11 @@ class WalkableAnalyzer(ignoreEnd:Boolean) extends Analyzer {
     }
   }
 
-  def analyze(mainTile:AstarTile, neighbors:List[AstarTile], request:PathRequest) : List[AstarTile] = {
+  def analyze(mainTile:AstarTile, neighbors:List[AstarTile], request:AstarPathRequest) : List[AstarTile] = {
     val walkableNeighbors = new ListBuffer[AstarTile]
     
     for(tile <- neighbors) {
-      if(tile.asInstanceOf[WalkableTile].getWalkable || ignoreEnd && request.isTarget(mainTile)) {
+      if(tile.asInstanceOf[WalkableTile].getWalkable || (ignoreEnd && tile == request.end)) {
         walkableNeighbors += tile
       }
     }
