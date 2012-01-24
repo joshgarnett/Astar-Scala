@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
-class DataTile(target:AstarTile) {
+class DataTile(target:AstarTile) extends Comparable[DataTile] {
   
   private val STANDARD_COST:Double = 1
   
@@ -39,11 +39,10 @@ class DataTile(target:AstarTile) {
   /**
    * Estimated total cost from start to goal through y
    */
-  private var f:Double = 0
+  private var f:Double = Double.MaxValue
   
-  private var open:Boolean = false
-  private var closed:Boolean = false
-  private var parent:AstarTile = null
+  private var open:Boolean = true
+  private var parent:DataTile = null
   private var multiplier:Double = 1
   
   def getTarget = target
@@ -62,14 +61,12 @@ class DataTile(target:AstarTile) {
   
   def getF = f
   
-  def getOpen = open
-  def setOpen(value:Boolean) = { open = value }
-  
-  def getClosed = closed
-  def setClosed(value:Boolean) = { closed = value }
+  def isOpen = open
+  def setOpen() = { open = true }
+  def setClosed() = { open = false }
   
   def getParent = parent
-  def setParent(value:AstarTile) = { parent = value }
+  def setParent(value:DataTile) = { parent = value }
   
   /**
    * Sets the distance from this tile to its parent
@@ -90,4 +87,9 @@ class DataTile(target:AstarTile) {
   def calculateUpdateF(parentCost:Double) : Double = {
     getCost + parentCost + h
   }
+  
+  def compareTo(that:DataTile) : Int = {
+    (this.getF - that.getF).toInt
+  }
+
 }

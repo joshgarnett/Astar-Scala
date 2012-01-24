@@ -28,13 +28,13 @@ import com.adverserealms.astar.core._
 import com.adverserealms.astar.basic2d._
 import org.slf4j.{Logger, LoggerFactory}
 
-class MockSquareGridMap extends Map {
+class MockLargeSquareGridMap extends Map {
   
   protected lazy val log = LoggerFactory.getLogger(getClass())
   
-  private val MAP_WIDTH = 4
+  private val MAP_WIDTH = 8
   
-  private val MAP_HEIGHT:Int = 4
+  private val MAP_HEIGHT:Int = 8
   
   private val tiles:List[MockSquareTile] = populateMockTiles()
   
@@ -47,10 +47,14 @@ class MockSquareGridMap extends Map {
   /**
    * Map: x's are not walkable
    * 
-   * 0000
-   * 0xx0
-   * 0xx0
-   * 0000
+   * 00000000
+   * 00000000
+   * 000000x0
+   * 000000x0
+   * 000000x0
+   * 000000x0
+   * 00xxxxx0
+   * 00000000
    */
   def populateMockTiles() : List[MockSquareTile] = {
     val tiles = new ListBuffer[MockSquareTile]
@@ -59,16 +63,10 @@ class MockSquareGridMap extends Map {
       for(x <- 0 until MAP_WIDTH) {
         val tile = new MockSquareTile(new Point(x,y))
         
-        if(x == 1 && y == 1) {
+        if(x == 6 && y > 1 && y < 7) {
           tile.setWalkable(false)
         }
-        if(x == 2 && y == 1) {
-          tile.setWalkable(false)
-        }
-        if(x == 1 && y == 2) {
-          tile.setWalkable(false)
-        }
-        if(x == 2 && y == 2) {
+        if(y == 6 && x > 1 && x < 7) {
           tile.setWalkable(false)
         }
         
