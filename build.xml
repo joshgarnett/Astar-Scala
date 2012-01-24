@@ -63,8 +63,8 @@
 	<target name="jar" depends="build">
 		<jar destfile="${jarfile}">
 			<fileset dir="${build}" includes="**/*.class">
-				<exclude name="**/*Test*.class" />
 				<exclude name="**/*Test.class" />
+				<exclude name="**/*Test$$anonfun*.class" />
 				<exclude name="**/Mock*.class" />
 			</fileset>
 		</jar>
