@@ -25,11 +25,14 @@ package com.adverserealms.astar.core
 import akka.actor._
 import akka.actor.Actor._
 import scala.collection.mutable.HashMap
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
  * The main search algorithm and core class of the Astar library
  */
-class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
+class Astar extends Actor {
+  
+  protected lazy val log = LoggerFactory.getLogger(getClass())
 
   private val dataTiles = new HashMap[AstarTile, DataTile]()
   
@@ -37,13 +40,16 @@ class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
     case req:AstarPathRequest =>
       getPath(req)
     case _ =>
-      //log error
-      
+      log.error("Invalid message sent to Astar actor")
   }
   
   private def getPath(request:AstarPathRequest) = {
+    log.debug("getPath")
+    
     //clear any values in the dataTiles HashMap
     dataTiles.clear()
+    
+    notifyListener(request, AstarPathError("Not implemented", request))
   }
   
   private def notifyListener(request:AstarPathRequest, value:Any) = {
@@ -53,7 +59,7 @@ class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
 
 object Astar {
   
-  private lazy val astarPool = actorOf[AstarPool]
+  private lazy val astarPool = actorOf[AstarPool].start
   
   /**
    * If Astar.safeMode is set to NORMAL_CHECK, the end tile will be
