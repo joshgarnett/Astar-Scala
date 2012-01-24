@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
-case class AstarPathRequest(start:AstarTile, end:AstarTile, map:Map)
+case class AstarPathRequest(start:AstarTile, end:AstarTile, map:Map, listener: (Any) => Unit, safeMode:Int = Astar.NORMAL_CHECK)
 
 case class AstarPathResponse(found:Boolean, request:AstarPathRequest, path:AstarPath = null)
 

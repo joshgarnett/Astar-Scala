@@ -30,13 +30,14 @@ class AstarPool extends Actor
   
   /**
    * Threshold to evaluate if the actor is considered to be busy.  
-   * In this case the actor is considered busy it is already processing
+   * In this case the actor is considered busy if it is already processing
    * a single message.
    */
   def pressureThreshold = 1
   
   /**
-   * This instructs the selector to only return unique actors from the pool
+   * This instructs the selector to only return unique actors from the pool.
+   * Since our selectionCount is set to 1, this value is ignored
    */
   def partialFill = true
   

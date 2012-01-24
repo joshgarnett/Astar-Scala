@@ -37,7 +37,7 @@ class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
     case req:AstarPathRequest =>
       getPath(req)
     case _ =>
-      self.channel ! AstarPathError("Invalid message sent to Astar", null)
+      //log error
       
   }
   
@@ -45,9 +45,15 @@ class Astar(safeMode:Int = Astar.NORMAL_CHECK) extends Actor {
     //clear any values in the dataTiles HashMap
     dataTiles.clear()
   }
+  
+  private def notifyListener(request:AstarPathRequest, value:Any) = {
+    request.listener(value)
+  }
 }
 
 object Astar {
+  
+  private lazy val astarPool = actorOf[AstarPool]
   
   /**
    * If Astar.safeMode is set to NORMAL_CHECK, the end tile will be
@@ -67,8 +73,7 @@ object Astar {
    * instantiate actors needed for asynchronous processing and will
    * clean them up.
    */
-  def getPath(path:AstarPathRequest, listener: (Any) => Unit, safeMode:Int = Astar.NORMAL_CHECK) = {
-    val proxy = actorOf(new AstarProxy(listener, safeMode)).start
-    proxy ! path
+  def getPath(path:AstarPathRequest) = {
+    astarPool ! path
   }
 }
