@@ -1,0 +1,72 @@
+<project name="gateway" basedir="." default="jar">
+
+	<!-- Project-specific properties -->
+	<property name="src" location="src" />
+	<property name="src.test" location="test" />
+	<property name="lib" location="lib" />
+	<property name="build" location="build" />
+	<property name="test.reports" location="test-reports" />
+	<property name="jarfile" value="${build}/astar-scala.jar" />
+
+	<!-- Import the scala ant tasks (scalac, fsc, etc) -->
+	<taskdef resource="scala/tools/ant/antlib.xml">
+		<classpath>
+			<pathelement location="${lib}/scala-compiler.jar" />
+			<pathelement location="${lib}/scala-library.jar" />
+		</classpath>
+	</taskdef>
+
+	<!-- Classpath for compiling source -->
+	<path id="build.classpath">
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="test.classpath">
+		<pathelement location="${build}" />
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Delete all output files -->
+	<target name="clean">
+		<delete dir="${build}" failOnError="false" includeEmptyDirs="true" />
+		<delete dir="${test.reports}" failOnError="false" includeEmptyDirs="true" />
+	</target>
+
+	<!-- Compile the source -->
+	<target name="build">
+		<mkdir dir="${build}" />
+		<scalac destdir="${build}" classpathref="build.classpath" deprecation="true">
+			<src path="${src}" />
+			<src path="${src.test}" />
+			<include name="**/*.scala" />
+		</scalac>
+	</target>
+
+	<target name="test" depends="build">
+		<mkdir dir="${test.reports}" />
+
+		<junit fork="yes" printsummary="yes" haltonfailure="yes">
+			<batchtest fork="yes" todir="${test.reports}">
+				<fileset dir="${build}">
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
+			<formatter type="xml" />
+			<classpath refid="test.classpath" />
+		</junit>
+	</target>
+
+	<target name="jar" depends="build">
+		<jar destfile="${jarfile}">
+			<fileset dir="${build}" includes="**/*.class">
+				<exclude name="**/*Test*.class" />
+				<exclude name="**/*Test.class" />
+				<exclude name="**/Mock*.class" />
+			</fileset>
+		</jar>
+	</target>
+</project>

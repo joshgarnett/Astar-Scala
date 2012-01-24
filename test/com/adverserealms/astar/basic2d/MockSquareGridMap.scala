@@ -153,7 +153,7 @@ class MockSquareGridMap extends Map {
   }
   
   private def getAxisDistance(start:Int, end:Int) : Int = {
-    Math.abs(start - end)
+    scala.math.abs(start - end)
   }
 
   def getDistance(start: AstarTile, end: AstarTile): Double = {
