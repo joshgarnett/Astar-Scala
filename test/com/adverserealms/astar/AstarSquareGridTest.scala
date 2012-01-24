@@ -11,15 +11,25 @@ import akka.util.Duration
 
 class AstarSquareGridTest {
   
+  private var astarPool:ActorRef = null
+  
+  @Before
+  def setUp = {
+    astarPool = actorOf[AstarPool].start
+  }
+  
+  @After
+  def tearDown = {
+    astarPool.stop()
+  }
+    
   @Test
   def sample() = {
     val map = new MockSquareGridMap
     
     val start = map.getTile(0,0)
     val end = map.getTile(3,3)
-    
-    val astarPool = actorOf[AstarPool].start
-    
+
     var response:Any = null
     val f = astarPool ? AstarPathRequest(start, end, map, (value:Any) => {
       response = value
@@ -30,6 +40,8 @@ class AstarSquareGridTest {
     
     assertNotNull("Response is not null", response)
     
-    assertTrue("reponse is an error", response.isInstanceOf[AstarPathError])
+    assertTrue("reponse is an error", response.isInstanceOf[AstarPathResponse])
+    
+    //add other checks to the path
   }
 }
