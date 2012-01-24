@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.6.3.jar"/>
 	<classpathentry kind="lib" path="lib/scala-compiler.jar"/>
 	<classpathentry kind="lib" path="lib/scala-library.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

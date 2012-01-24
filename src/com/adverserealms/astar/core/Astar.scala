@@ -54,6 +54,9 @@ class Astar extends Actor {
   
   private def notifyListener(request:AstarPathRequest, value:Any) = {
     request.listener(value)
+    
+    //This is primarily for alerting futures that the request is complete
+    self.channel ! value
   }
 }
 
