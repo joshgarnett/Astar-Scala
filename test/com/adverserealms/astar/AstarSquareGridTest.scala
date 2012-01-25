@@ -70,6 +70,8 @@ class AstarSquareGridTest {
     assertTrue("Path was found", pathResponse.found)
     
     assertEquals("Path length is 5", 5, pathResponse.path.getPath.size)
+    
+    println("squareGridTest: " + pathResponse.path.toString())
   }
   
   @Test
@@ -96,5 +98,7 @@ class AstarSquareGridTest {
     assertTrue("Path was found", pathResponse.found)
     
     assertEquals("Path length is 12", 12, pathResponse.path.getPath.size)
+    
+    println("largeSquareGridTest: " + pathResponse.path.toString())
   }
 }

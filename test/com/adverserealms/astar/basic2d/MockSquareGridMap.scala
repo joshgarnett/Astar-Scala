@@ -139,14 +139,12 @@ class MockSquareGridMap extends Map {
     val start = tile.asInstanceOf[PositionTile].getPosition()
     val end = req.end.asInstanceOf[PositionTile].getPosition()
       
-    var distance:Point = getXYDistanceBetweenPoints(start, end);
+    //using a diagonal distance heuristic
+    val distance:Point = getXYDistanceBetweenPoints(start, end);
       
-    if(distance.getX > distance.getY) {
-      diagonalMultiplier * defaultCost * distance.getY + normalMultiplier * defaultCost * (distance.getX - distance.getY);
-    }
-    else {
-      diagonalMultiplier * defaultCost * distance.getX + normalMultiplier * defaultCost * (distance.getY - distance.getX);
-    }
+    var h = scala.math.max(distance.getX, distance.getY)
+
+    h
   }
   
   def getXYDistanceBetweenPoints(start:Point, end:Point) : Point = {
@@ -158,7 +156,16 @@ class MockSquareGridMap extends Map {
   }
 
   def getDistance(start: AstarTile, end: AstarTile): Double = {
-    1.0d
+    val startP = start.asInstanceOf[PositionTile].getPosition()
+    val endP = end.asInstanceOf[PositionTile].getPosition()
+    
+    if(startP.getX != endP.getX && startP.getY != endP.getY) {
+      //diagonal move
+      1.4d
+    }
+    else {
+      1.0d
+    }
   }
 
 }
