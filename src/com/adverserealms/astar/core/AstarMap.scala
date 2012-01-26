@@ -22,8 +22,23 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
-case class AstarPathRequest(start:AstarTile, end:AstarTile, map:AstarMap, analyzers:List[Analyzer], listener: (Any) => Unit, safeMode:Int = Astar.NORMAL_CHECK)
-
-case class AstarPathResponse(found:Boolean, request:AstarPathRequest, path:AstarPath = null)
-
-case class AstarPathError(message:String, request:AstarPathRequest)
+/**
+ * Defines an interface for maps to be used with the Astar class
+ */
+trait AstarMap {
+  
+  /**
+   * Returns a Vector list of IAstarTiles that are neighbors of the given IAstarTile
+   */
+  def getNeighbors(tile:AstarTile) : List[AstarTile]
+  
+  /**
+   * Returns the heuristic for the given tile and the given PathRequest.
+   */
+  def getHeuristic(tile:AstarTile, req:AstarPathRequest) : Double
+  
+  /**
+   * Returns the distance for the given two tiles.
+   */
+  def getDistance(start:AstarTile, end:AstarTile) : Double
+}

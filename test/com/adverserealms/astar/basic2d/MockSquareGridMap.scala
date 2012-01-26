@@ -27,7 +27,7 @@ import scala.collection.mutable.ListBuffer
 import com.adverserealms.astar.core._
 import com.adverserealms.astar.basic2d._
 
-class MockSquareGridMap extends Map {
+class MockSquareGridMap extends AstarMap {
   
   private val MAP_WIDTH = 4
   
