@@ -44,7 +44,7 @@ class Astar extends Actor {
   /**
    * The heap stores all the tiles in the open list
    */
-  private val heap = new PriorityQueue[DataTile]()
+  private val heap = new AstarQueue(100)
   
   /**
    * The PathRequest that is being processed
@@ -92,7 +92,7 @@ class Astar extends Actor {
       var pathFound:Boolean = false
       
       while(!heap.isEmpty && !pathFound) {
-        val current = heap.poll()
+        val current = heap.pop()
         
         //check if the destination has been reached
         if(current.getTarget == end.getTarget) {
@@ -121,8 +121,7 @@ class Astar extends Actor {
                 neighbor.setG(current.getG)
                 
                 //remove and re-add the neighbor to adjust priority
-                heap.remove(neighbor)
-                heap.add(neighbor)
+                heap.modify(neighbor)
               }
             }
           }
@@ -232,7 +231,7 @@ class Astar extends Actor {
     tile.setOpen()
     tile.setG(g)
     tile.setH(currentRequest.map.getHeuristic(tile.getTarget, currentRequest))
-    heap.add(tile)
+    heap.push(tile)
   }
   
   /**
