@@ -235,6 +235,7 @@ class Astar extends Actor {
     tile.setOpen()
     tile.setG(g)
     tile.setH(currentRequest.map.getHeuristic(tile.getTarget, currentRequest))
+    tile.setParent(parent)
     heap.add(tile)
   }
   
