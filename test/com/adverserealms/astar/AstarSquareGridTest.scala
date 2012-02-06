@@ -75,6 +75,34 @@ class AstarSquareGridTest {
   }
   
   @Test
+  def squareGridInvalidTest() = {
+    val map = new MockSquareGridMap
+    
+    val start = map.getTile(0,0)
+    val end = map.getTile(0,0)
+
+    var response:Any = null
+    val f = astarPool ? AstarPathRequest(start, end, map, List(new WalkableAnalyzer(false)), (value:Any) => {
+      response = value
+    })
+    
+    //wait up to a second for a response
+    f.await(Duration.create(1, TimeUnit.SECONDS))
+    
+    assertNotNull("Response is not null", response)
+    
+    assertTrue("Listener received a AstarPathResponse", response.isInstanceOf[AstarPathResponse])
+    
+    val pathResponse = response.asInstanceOf[AstarPathResponse]
+    
+    assertTrue("Path was found", !pathResponse.partial)
+    
+    assertEquals("Path length is 0", 0, pathResponse.pathLength)
+    
+    println("squareGridInvalidTest: " + pathResponse.path.toString())
+  }
+  
+  @Test
   def largeSquareGridTest() = {
     val map = new MockLargeSquareGridMap
     
@@ -127,7 +155,7 @@ class AstarSquareGridTest {
     
     assertEquals("Path length is 0", 0, pathResponse.pathLength)
     
-    println("largeSquareGridPartialTest: " + pathResponse.path.toString())
+    println("largeSquareGridInvalidTest: " + pathResponse.path.toString())
   }
   
   @Test
