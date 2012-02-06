@@ -90,23 +90,24 @@ class Astar extends Actor {
       //open the starting tile and add it to the heap
       openTile(start, 0, null)
       
-      var pathFound:Boolean = false
-      
-      while(!heap.isEmpty && !pathFound) {
+      var lastBestTile:DataTile = start;
+      var lastBestH:Double = start.getH;
+          
+      while(!heap.isEmpty) {
         val current = heap.poll()
         
+
         //check if the destination has been reached
         if(current.getTarget == end.getTarget) {
-          pathFound = true
-          end = current
+          lastBestTile = current
         }
         else {
           //close current tile
           current.setClosed()
           
-          //get surrounding neighbours
+          //get surrounding neighbors
           val neighbors = getNeighbors(current)
-          
+        
           //now inspect the neighbors
           for(neighbor <- neighbors) {
             if(!neighbor.isOpen) {
@@ -119,25 +120,26 @@ class Astar extends Actor {
               if(newF < neighbor.getF) {
                 neighbor.setParent(current)
                 neighbor.setDistance(currentRequest.map.getDistance(current.getTarget, neighbor.getTarget))
-                neighbor.setG(current.getG)
                 
                 //remove and re-add the neighbor to adjust priority
                 heap.remove(neighbor)
-                heap.add(neighbor)
+                openTile(neighbor, current.getG, current)
               }
+            }
+            
+            if (neighbor.getH < lastBestH) {
+              lastBestTile = neighbor
+              lastBestH = neighbor.getH	
             }
           }
         }
       }
       
-      val path:AstarPath = if(pathFound) { 
-        buildPath(start, end) 
-      }
-      else {
-        null
-      }
+      var partialPath = ((lastBestTile != end) && request.safeMode == Astar.PARTIAL_CHECK)
       
-      notifyListener(request, AstarPathResponse(pathFound, request, path))
+      val path:AstarPath = buildPath(start, lastBestTile)
+      
+      notifyListener(request, AstarPathResponse(partialPath, request, path, path.getPath.size))
       
       //cleanup
       dataTiles.clear()
@@ -233,6 +235,7 @@ class Astar extends Actor {
     tile.setOpen()
     tile.setG(g)
     tile.setH(currentRequest.map.getHeuristic(tile.getTarget, currentRequest))
+    tile.setParent(parent)
     heap.add(tile)
   }
   
@@ -265,11 +268,19 @@ object Astar {
    */
   val NORMAL_CHECK:Int = 0
   
+  
   /**
    * If Astar.safeMode is set to NO_CHECK, nothing will be checked
    * at the start of the search.
    */
   val NO_CHECK:Int = 1
+  
+  /**
+   * If Astar.safeMode is set to PARTIAL_CHECK, it will not check
+   * the if the end point is valid but may do other checks and will
+   * return a path even if the end point is not reached
+   */
+  val PARTIAL_CHECK:Int = 2;
   
   /**
    * Static method for finding an Astar path.  It will automatically

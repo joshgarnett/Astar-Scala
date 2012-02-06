@@ -24,6 +24,6 @@ package com.adverserealms.astar.core
 
 case class AstarPathRequest(start:AstarTile, end:AstarTile, map:AstarMap, analyzers:List[Analyzer], listener: (Any) => Unit, safeMode:Int = Astar.NORMAL_CHECK)
 
-case class AstarPathResponse(found:Boolean, request:AstarPathRequest, path:AstarPath = null)
+case class AstarPathResponse(partial:Boolean, request:AstarPathRequest, path:AstarPath = null, pathLength:Int = 0)
 
 case class AstarPathError(message:String, request:AstarPathRequest)
