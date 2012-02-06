@@ -118,7 +118,6 @@ class Astar extends Actor {
             else {
               val newF = neighbor.calculateUpdateF(current.getG)
               if(newF < neighbor.getF) {
-                neighbor.setParent(current)
                 neighbor.setDistance(currentRequest.map.getDistance(current.getTarget, neighbor.getTarget))
                 
                 //remove and re-add the neighbor to adjust priority
