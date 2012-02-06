@@ -67,9 +67,9 @@ class AstarSquareGridTest {
     
     val pathResponse = response.asInstanceOf[AstarPathResponse]
     
-    assertTrue("Path was found", pathResponse.found)
+    assertTrue("Path was found", !pathResponse.partial)
     
-    assertEquals("Path length is 5", 5, pathResponse.path.getPath.size)
+    assertEquals("Path length is 5", 5, pathResponse.pathLength)
     
     println("squareGridTest: " + pathResponse.path.toString())
   }
@@ -95,10 +95,66 @@ class AstarSquareGridTest {
     
     val pathResponse = response.asInstanceOf[AstarPathResponse]
     
-    assertTrue("Path was found", pathResponse.found)
+    assertTrue("Path was found", !pathResponse.partial)
     
-    assertEquals("Path length is 12", 12, pathResponse.path.getPath.size)
+    assertEquals("Path length is 12", 12, pathResponse.pathLength)
     
     println("largeSquareGridTest: " + pathResponse.path.toString())
+  }
+  
+  @Test
+  def largeSquareGridInvalidTest() = {
+    val map = new MockLargeSquareGridMap
+    
+    val start = map.getTile(6,2)
+    val end = map.getTile(6,3)
+
+    var response:Any = null
+    val f = astarPool ? AstarPathRequest(start, end, map, List(new WalkableAnalyzer(false)), (value:Any) => {
+      response = value
+    }, Astar.PARTIAL_CHECK)
+    
+    //wait up to a second for a response
+    f.await(Duration.create(1, TimeUnit.SECONDS))
+    
+    assertNotNull("Response is not null", response)
+    
+    assertTrue("Listener received a AstarPathResponse", response.isInstanceOf[AstarPathResponse])
+    
+    val pathResponse = response.asInstanceOf[AstarPathResponse]
+    
+    assertTrue("Path was found", pathResponse.partial)
+    
+    assertEquals("Path length is 0", 0, pathResponse.pathLength)
+    
+    println("largeSquareGridPartialTest: " + pathResponse.path.toString())
+  }
+  
+  @Test
+  def largeSquareGridPartialTest() = {
+    val map = new MockLargeSquareGridMap
+    
+    val start = map.getTile(0,0)
+    val end = map.getTile(6,3)
+
+    var response:Any = null
+    val f = astarPool ? AstarPathRequest(start, end, map, List(new WalkableAnalyzer(false)), (value:Any) => {
+      response = value
+    }, Astar.PARTIAL_CHECK)
+    
+    //wait up to a second for a response
+    f.await(Duration.create(1, TimeUnit.SECONDS))
+    
+    assertNotNull("Response is not null", response)
+    
+    assertTrue("Listener received a AstarPathResponse", response.isInstanceOf[AstarPathResponse])
+    
+    val pathResponse = response.asInstanceOf[AstarPathResponse]
+    
+    assertTrue("Path was found", pathResponse.partial)
+    
+    assertEquals("Path length is 5", 5, pathResponse.pathLength)
+    
+    println("largeSquareGridPartialTest: " + pathResponse.path.toString())
   }
 }

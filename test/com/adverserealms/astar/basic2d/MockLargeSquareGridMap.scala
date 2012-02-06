@@ -141,7 +141,7 @@ class MockLargeSquareGridMap extends AstarMap {
     val distance:Point = getXYDistanceBetweenPoints(start, end);
       
     var h = scala.math.max(distance.getX, distance.getY)
-
+    	
     h
   }
   
