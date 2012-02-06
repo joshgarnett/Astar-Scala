@@ -28,6 +28,7 @@ import scala.collection.mutable.HashMap
 import org.slf4j.LoggerFactory
 import akka.actor.Actor._
 import akka.actor.Actor
+import akka.dispatch.CompletableFuture
 
 /**
  * The main search algorithm and core class of the Astar library
@@ -241,8 +242,15 @@ class Astar extends Actor {
   private def notifyListener(request:AstarPathRequest, value:Any) = {
     request.listener(value)
     
-    //This is primarily for alerting futures that the request is complete
-    self.channel ! value
+    try {
+      //This is primarily for alerting futures that the request is complete
+      self.senderFuture match {
+        case Some(future) =>
+          self.channel ! value
+        case None =>
+      }
+    }
+    catch { case _ => }
   }
 }
 

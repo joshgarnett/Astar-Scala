@@ -28,7 +28,7 @@ import com.adverserealms.astar.core._
 import com.adverserealms.astar.basic2d._
 import org.slf4j.{Logger, LoggerFactory}
 
-class MockLargeSquareGridMap extends Map {
+class MockLargeSquareGridMap extends AstarMap {
   
   protected lazy val log = LoggerFactory.getLogger(getClass())
   
