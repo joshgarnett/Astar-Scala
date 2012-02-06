@@ -26,14 +26,23 @@ import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 import com.adverserealms.astar.core._
 import com.adverserealms.astar.basic2d._
+import org.slf4j.{Logger, LoggerFactory}
 
 class MockSquareGridMap extends AstarMap {
+  
+  protected lazy val log = LoggerFactory.getLogger(getClass())
   
   private val MAP_WIDTH = 4
   
   private val MAP_HEIGHT:Int = 4
   
   private val tiles:List[MockSquareTile] = populateMockTiles()
+  
+  private val diagonalMultiplier = 1.4d
+  
+  private val normalMultiplier = 1.0d
+  
+  private val defaultCost = 1.0d
     
   /**
    * Map: x's are not walkable
@@ -133,7 +142,9 @@ class MockSquareGridMap extends AstarMap {
     //using a diagonal distance heuristic
     val distance:Point = getXYDistanceBetweenPoints(start, end);
       
-    scala.math.max(distance.getX, distance.getY)
+    var h = scala.math.max(distance.getX, distance.getY)
+
+    h
   }
   
   def getXYDistanceBetweenPoints(start:Point, end:Point) : Point = {
