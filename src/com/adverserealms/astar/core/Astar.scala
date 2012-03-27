@@ -58,16 +58,20 @@ class Astar extends Actor {
     case _ =>
       log.error("Invalid message sent to Astar actor")
   }
-  
+
   /**
    * Processes the PathRequest
    */
-  private def getPath(request:AstarPathRequest) = {
+  private def getPath(request: AstarPathRequest) = {
+    //clear any values in the dataTiles HashMap and the heap
+    dataTiles.clear()
+    heap.clear()
+
     //check if the endpoint is valid
     var validPath = true
-    if(request.safeMode == Astar.NORMAL_CHECK) {
-      for(analyzer <- request.analyzers) {
-        if(!analyzer.analyzeTile(request.end, request)) {
+    if (request.safeMode == Astar.NORMAL_CHECK) {
+      for (analyzer <- request.analyzers) {
+        if (!analyzer.analyzeTile(getDataTile(request.end), request)) {
           validPath = false
         }
       }
@@ -77,10 +81,6 @@ class Astar extends Actor {
       notifyListener(request, AstarPathError("The end tile is not a valid tile", request))
     }
     else {
-      //clear any values in the dataTiles HashMap and the heap
-      dataTiles.clear()
-      heap.clear()
-      
       //set the request that is being processed
       currentRequest = request
       
@@ -91,12 +91,11 @@ class Astar extends Actor {
       openTile(start, 0, null)
       
       var lastBestTile:DataTile = start;
-      var lastBestH:Double = start.getH;
+      var lastBestH:Float = start.getH;
           
-      while(!heap.isEmpty) {
+      while(!heap.isEmpty && lastBestTile.getTarget != end.getTarget) {
         val current = heap.poll()
         
-
         //check if the destination has been reached
         if(current.getTarget == end.getTarget) {
           lastBestTile = current
@@ -167,28 +166,14 @@ class Astar extends Actor {
    * the list of analyzers specified by the request.
    */
   private def getNeighbors(dataTile:DataTile) : List[DataTile] = {
-    val allNeighbors = getStandardNeighbors(dataTile)
-    
-    val astarTileNeighbors = new ListBuffer[AstarTile]
-    
-    //convert DataTiles into AstarTiles for analyzers
-    for(t <- allNeighbors) {
-      astarTileNeighbors += t.getTarget
-    }
+    var neighbors = getStandardNeighbors(dataTile)
     
     //pass the list through each of the analyzers
-    var analyzedNeighbours = astarTileNeighbors.toList
     for(analyzer <- currentRequest.analyzers) {
-      analyzedNeighbours = analyzer.analyze(dataTile.getTarget, analyzedNeighbours, currentRequest)
+      neighbors = analyzer.analyze(dataTile.getTarget, neighbors, currentRequest)
     }
     
-    //convert the results back to DataTiles
-    val finalNeighbors = new ListBuffer[DataTile]
-    for(t <- analyzedNeighbours) {
-      finalNeighbors += getDataTile(t)
-    }
-    
-    finalNeighbors.toList
+    neighbors
   }
   
   /**
@@ -230,7 +215,7 @@ class Astar extends Actor {
    * Opens a tile. The tile's position is set, it's added to the open list, the G and H 
    * are set and the parent is set. Afterwards, the tile is added to the heap.
    */
-  private def openTile(tile:DataTile, g:Double, parent:DataTile)  = {
+  private def openTile(tile:DataTile, g:Float, parent:DataTile)  = {
     tile.setOpen()
     tile.setG(g)
     tile.setH(currentRequest.map.getHeuristic(tile.getTarget, currentRequest))
@@ -258,7 +243,7 @@ class Astar extends Actor {
 
 object Astar {
   
-  private lazy val astarPool = actorOf[AstarPool].start
+  private val astarPool = actorOf[AstarPool].start
   
   /**
    * If Astar.safeMode is set to NORMAL_CHECK, the end tile will be

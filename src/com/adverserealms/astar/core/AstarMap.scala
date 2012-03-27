@@ -35,10 +35,10 @@ trait AstarMap {
   /**
    * Returns the heuristic for the given tile and the given PathRequest.
    */
-  def getHeuristic(tile:AstarTile, req:AstarPathRequest) : Double
+  def getHeuristic(tile:AstarTile, req:AstarPathRequest) : Float
   
   /**
    * Returns the distance for the given two tiles.
    */
-  def getDistance(start:AstarTile, end:AstarTile) : Double
+  def getDistance(start:AstarTile, end:AstarTile) : Float
 }

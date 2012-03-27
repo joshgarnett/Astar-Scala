@@ -23,38 +23,36 @@ THE SOFTWARE.
 package com.adverserealms.astar.core
 
 class DataTile(target:AstarTile) extends Comparable[DataTile] {
-  
-  private val STANDARD_COST:Double = 1
-  
+ 
   /**
    * Cost from start along best known path.
    */
-  private var g:Double = 0
+  private var g:Float = 0
   
   /**
    * Heuristic Cost Estimate
    */
-  private var h:Double = 0
+  private var h:Float = 0
   
   /**
    * Estimated total cost from start to goal through y
    */
-  private var f:Double = Double.MaxValue
+  private var f:Float = Float.MaxValue
   
   private var open:Boolean = true
   private var parent:DataTile = null
-  private var multiplier:Double = 1
+  private var multiplier:Float = 1
   
   def getTarget = target
   
   def getG = g
-  def setG(value:Double) = {
+  def setG(value:Float) = {
     g = value + getCost
     f = h + g
   }
   
   def getH = h
-  def setH(value:Double) = {
+  def setH(value:Float) = {
     h = value
     f = h + g
   }
@@ -71,20 +69,20 @@ class DataTile(target:AstarTile) extends Comparable[DataTile] {
   /**
    * Sets the distance from this tile to its parent
    */
-  def setDistance(distance:Double) = {
+  def setDistance(distance:Float) = {
     multiplier = distance
   }
   
-  def getCost() : Double = {
+  def getCost() : Float = {
     if(target.isInstanceOf[CostTile]) {
       target.asInstanceOf[CostTile].getCost() * multiplier
     }
     else {
-      STANDARD_COST * multiplier
+      DataTile.STANDARD_COST * multiplier
     }
   }
   
-  def calculateUpdateF(parentCost:Double) : Double = {
+  def calculateUpdateF(parentCost:Float) : Float = {
     getCost + parentCost + h
   }
   
@@ -92,4 +90,8 @@ class DataTile(target:AstarTile) extends Comparable[DataTile] {
     (this.getF - that.getF).toInt
   }
 
+}
+
+object DataTile {
+  private val STANDARD_COST:Float = 1
 }

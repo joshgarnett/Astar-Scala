@@ -135,7 +135,7 @@ class MockSquareGridMap extends AstarMap {
     }
   }
 
-  def getHeuristic(tile: AstarTile, req: AstarPathRequest): Double = { 
+  def getHeuristic(tile: AstarTile, req: AstarPathRequest): Float = { 
     val start = tile.asInstanceOf[PositionTile].getPosition()
     val end = req.end.asInstanceOf[PositionTile].getPosition()
       
@@ -155,16 +155,16 @@ class MockSquareGridMap extends AstarMap {
     scala.math.abs(start - end)
   }
 
-  def getDistance(start: AstarTile, end: AstarTile): Double = {
+  def getDistance(start: AstarTile, end: AstarTile): Float = {
     val startP = start.asInstanceOf[PositionTile].getPosition()
     val endP = end.asInstanceOf[PositionTile].getPosition()
     
     if(startP.getX != endP.getX && startP.getY != endP.getY) {
       //diagonal move
-      1.4d
+      1.4f
     }
     else {
-      1.0d
+      1.0f
     }
   }
 

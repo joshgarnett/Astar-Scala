@@ -43,12 +43,12 @@ class AstarPool extends Actor
   /**
    * The minimum number of actors to start with in the pool
    */
-  def lowerBound = 5
+  def lowerBound = 20
   
   /**
    * The maximum number of actors to ramp to in the pool
    */
-  def upperBound = 20
+  def upperBound = 50
   
   /**
    * Threshold to evaluate if the actor is considered to be busy.  

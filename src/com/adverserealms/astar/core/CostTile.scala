@@ -30,5 +30,5 @@ trait CostTile {
   /**
    * Returns the cost for this tile
    */
-  def getCost() : Double
+  def getCost() : Float
 }

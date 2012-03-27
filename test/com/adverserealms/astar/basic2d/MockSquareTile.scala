@@ -39,8 +39,8 @@ class MockSquareTile(point:Point) extends PositionTile with AstarTile with CostT
     point
   }
   
-  def getCost() : Double = {
-    1.0d
+  def getCost() : Float = {
+    1.0f
   }
 
 }
