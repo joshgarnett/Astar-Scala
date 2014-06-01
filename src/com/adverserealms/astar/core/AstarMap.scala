@@ -22,23 +22,25 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * Defines an interface for maps to be used with the Astar class
  */
 trait AstarMap {
-  
+
   /**
    * Returns a Vector list of IAstarTiles that are neighbors of the given IAstarTile
    */
-  def getNeighbors(tile:AstarTile) : List[AstarTile]
-  
+  def getNeighbors(tile: AstarTile): List[_ <: AstarTile]
+
   /**
    * Returns the heuristic for the given tile and the given PathRequest.
    */
-  def getHeuristic(tile:AstarTile, req:AstarPathRequest) : Float
-  
+  def getHeuristic(tile: AstarTile, req: AstarPathRequest): Double
+
   /**
    * Returns the distance for the given two tiles.
    */
-  def getDistance(start:AstarTile, end:AstarTile) : Float
+  def getDistance(start: AstarTile, end: AstarTile): Double
 }

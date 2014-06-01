@@ -26,108 +26,108 @@ import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 import com.adverserealms.astar.core._
 import com.adverserealms.astar.basic2d._
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.{ Logger, LoggerFactory }
 
 class MockSquareGridMap extends AstarMap {
-  
+
   protected lazy val log = LoggerFactory.getLogger(getClass())
-  
+
   private val MAP_WIDTH = 4
-  
-  private val MAP_HEIGHT:Int = 4
-  
-  private val tiles:List[MockSquareTile] = populateMockTiles()
-  
+
+  private val MAP_HEIGHT: Int = 4
+
+  private val tiles: List[MockSquareTile] = populateMockTiles()
+
   private val diagonalMultiplier = 1.4d
-  
+
   private val normalMultiplier = 1.0d
-  
+
   private val defaultCost = 1.0d
-    
+
   /**
    * Map: x's are not walkable
-   * 
+   *
    * 0000
    * 0xx0
    * 0xx0
    * 0000
    */
-  def populateMockTiles() : List[MockSquareTile] = {
+  def populateMockTiles(): List[MockSquareTile] = {
     val tiles = new ListBuffer[MockSquareTile]
-    
-    for(y <- 0 until MAP_HEIGHT) {
-      for(x <- 0 until MAP_WIDTH) {
-        val tile = new MockSquareTile(new Point(x,y))
-        
-        if(x == 1 && y == 1) {
+
+    for (y <- 0 until MAP_HEIGHT) {
+      for (x <- 0 until MAP_WIDTH) {
+        val tile = new MockSquareTile(new Point(x, y))
+
+        if (x == 1 && y == 1) {
           tile.setWalkable(false)
         }
-        if(x == 2 && y == 1) {
+        if (x == 2 && y == 1) {
           tile.setWalkable(false)
         }
-        if(x == 1 && y == 2) {
+        if (x == 1 && y == 2) {
           tile.setWalkable(false)
         }
-        if(x == 2 && y == 2) {
+        if (x == 2 && y == 2) {
           tile.setWalkable(false)
         }
-        
+
         tiles += tile
       }
     }
-    
+
     tiles.toList
   }
-  
-  def getNeighbors(tile: AstarTile): List[AstarTile] = { 
+
+  def getNeighbors(tile: AstarTile): List[AstarTile] = {
     val neighbors = new ListBuffer[AstarTile]
-    
+
     val position = tile.asInstanceOf[PositionTile].getPosition()
-    
+
     val x = position.getX
     val y = position.getY
-    
+
     //up, left
-    if(getTile(x - 1, y - 1) != null) {
+    if (getTile(x - 1, y - 1) != null) {
       neighbors += getTile(x - 1, y - 1)
     }
     //up
-    if(getTile(x, y - 1) != null) {
+    if (getTile(x, y - 1) != null) {
       neighbors += getTile(x, y - 1)
     }
     //up, right
-    if(getTile(x + 1, y - 1) != null) {
+    if (getTile(x + 1, y - 1) != null) {
       neighbors += getTile(x + 1, y - 1)
     }
     //left
-    if(getTile(x - 1, y) != null) {
+    if (getTile(x - 1, y) != null) {
       neighbors += getTile(x - 1, y)
     }
     //right
-    if(getTile(x + 1, y) != null) {
+    if (getTile(x + 1, y) != null) {
       neighbors += getTile(x + 1, y)
     }
     //down, left
-    if(getTile(x - 1, y + 1) != null) {
+    if (getTile(x - 1, y + 1) != null) {
       neighbors += getTile(x - 1, y + 1)
     }
     //down
-    if(getTile(x, y + 1) != null) {
+    if (getTile(x, y + 1) != null) {
       neighbors += getTile(x, y + 1)
     }
     //down, right
-    if(getTile(x + 1, y + 1) != null) {
+    if (getTile(x + 1, y + 1) != null) {
       neighbors += getTile(x + 1, y + 1)
     }
-    
+
     neighbors.toList
   }
-  
-  def getTile(x:Int, y:Int) : MockSquareTile = {
-    if(x < 0 || x >= MAP_WIDTH) {
+
+  def getTile(x: Int, y: Int): MockSquareTile = {
+    if (x < 0 || x >= MAP_WIDTH) {
       null
     }
-    else if(y < 0 || y >= MAP_HEIGHT) {
+    else if (y < 0 || y >= MAP_HEIGHT) {
       null
     }
     else {
@@ -135,31 +135,31 @@ class MockSquareGridMap extends AstarMap {
     }
   }
 
-  def getHeuristic(tile: AstarTile, req: AstarPathRequest): Float = { 
+  def getHeuristic(tile: AstarTile, req: AstarPathRequest): Float = {
     val start = tile.asInstanceOf[PositionTile].getPosition()
     val end = req.end.asInstanceOf[PositionTile].getPosition()
-      
+
     //using a diagonal distance heuristic
-    val distance:Point = getXYDistanceBetweenPoints(start, end);
-      
+    val distance: Point = getXYDistanceBetweenPoints(start, end);
+
     var h = scala.math.max(distance.getX, distance.getY)
 
     h
   }
-  
-  def getXYDistanceBetweenPoints(start:Point, end:Point) : Point = {
+
+  def getXYDistanceBetweenPoints(start: Point, end: Point): Point = {
     new Point(getAxisDistance(start.getX, end.getX), getAxisDistance(start.getY, end.getY))
   }
-  
-  private def getAxisDistance(start:Int, end:Int) : Int = {
+
+  private def getAxisDistance(start: Int, end: Int): Int = {
     scala.math.abs(start - end)
   }
 
   def getDistance(start: AstarTile, end: AstarTile): Float = {
     val startP = start.asInstanceOf[PositionTile].getPosition()
     val endP = end.asInstanceOf[PositionTile].getPosition()
-    
-    if(startP.getX != endP.getX && startP.getY != endP.getY) {
+
+    if (startP.getX != endP.getX && startP.getY != endP.getY) {
       //diagonal move
       1.4f
     }

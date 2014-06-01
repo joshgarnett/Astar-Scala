@@ -22,9 +22,9 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.basic2d
 
-class Point(x:Int, y:Int) {
+class Point(x: Int, y: Int) {
 
   def getX = x
-  
+
   def getY = y
 }

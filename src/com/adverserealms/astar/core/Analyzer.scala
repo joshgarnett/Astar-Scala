@@ -22,30 +22,32 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * The Analyzer class describes searching constraints for the Astar class.
  */
 trait Analyzer {
 
   /**
-   * Used to validate a single tile. This method is used to see if the 
+   * Used to validate a single tile. This method is used to see if the
    * start/end tile is a valid tile.
-   * 
+   *
    * @param mainTile The tile that is being analyzed
    * @param req The path request that is currently being executed
-   * 
+   *
    * @return A boolean indicating whether or not the tile is valid
    */
-  def analyzeTile(mainTile:DataTile, req:AstarPathRequest) : Boolean
-  
+  def analyzeTile(mainTile: DataTile, req: AstarPathRequest): Boolean
+
   /**
    * Eliminates neighbors from the given array and returns the neighbors that were valid.
-   * 
+   *
    * @param mainTile The tile who's neighbors are being analyzed
    * @param neighbors A list consisting of all the neighbors of the mainTile
    * @param request The PathRequest that is currently being executed
-   * 
+   *
    * @return A list consisting of all the neighbors that passed this analyzer
    */
-  def analyze(mainTile:AstarTile, neighbors:List[DataTile], request:AstarPathRequest) : List[DataTile]
+  def analyze(mainTile: AstarTile, neighbors: ArrayBuffer[DataTile], request: AstarPathRequest): ArrayBuffer[DataTile]
 }

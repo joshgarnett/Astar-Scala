@@ -22,76 +22,101 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.core
 
-class DataTile(target:AstarTile) extends Comparable[DataTile] {
- 
+class DataTile() extends Comparable[DataTile] {
+
   /**
    * Cost from start along best known path.
    */
-  private var g:Float = 0
-  
+  private var g: Double = 0
+
   /**
    * Heuristic Cost Estimate
    */
-  private var h:Float = 0
-  
+  private var h: Double = 0
+
   /**
    * Estimated total cost from start to goal through y
    */
-  private var f:Float = Float.MaxValue
-  
-  private var open:Boolean = true
-  private var parent:DataTile = null
-  private var multiplier:Float = 1
-  
-  def getTarget = target
-  
+  private var f: Double = Double.MaxValue
+
+  private var open: Boolean = true
+  private var parent: DataTile = null
+  private var multiplier: Double = 1
+
+  private var _target: AstarTile = null
+
+  def getTarget = _target
+
+  def setTarget(target: AstarTile) = _target = target
+
+  /**
+   * This is called when an DataTile is returned to the pool
+   */
+  def reset() = {
+    g = 0
+    h = 0
+    f = Double.MaxValue
+    open = true
+    parent = null
+    multiplier = 1
+    _target = null
+  }
+
   def getG = g
-  def setG(value:Float) = {
+  def setG(value: Double) = {
     g = value + getCost
     f = h + g
   }
-  
+
   def getH = h
-  def setH(value:Float) = {
+  def setH(value: Double) = {
     h = value
     f = h + g
   }
-  
+
   def getF = f
-  
+
   def isOpen = open
   def setOpen() = { open = true }
   def setClosed() = { open = false }
-  
+
   def getParent = parent
-  def setParent(value:DataTile) = { parent = value }
-  
+  def setParent(value: DataTile) = { parent = value }
+
   /**
    * Sets the distance from this tile to its parent
    */
-  def setDistance(distance:Float) = {
+  def setDistance(distance: Double) = {
     multiplier = distance
   }
-  
-  def getCost() : Float = {
-    if(target.isInstanceOf[CostTile]) {
-      target.asInstanceOf[CostTile].getCost() * multiplier
+
+  def getCost(): Double = {
+    if (_target.isInstanceOf[CostTile]) {
+      _target.asInstanceOf[CostTile].getCost() * multiplier
     }
     else {
       DataTile.STANDARD_COST * multiplier
     }
   }
-  
-  def calculateUpdateF(parentCost:Float) : Float = {
+
+  def calculateUpdateF(parentCost: Double): Double = {
     getCost + parentCost + h
   }
-  
-  def compareTo(that:DataTile) : Int = {
-    (this.getF - that.getF).toInt
+
+  def compareTo(that: DataTile): Int = {
+    if (this.getF < that.getF) {
+      -1
+    }
+    else if (this.getF > that.getF) {
+      1
+    }
+    else {
+      0
+    }
   }
 
 }
 
 object DataTile {
-  private val STANDARD_COST:Float = 1
+  private val STANDARD_COST: Double = 1
 }

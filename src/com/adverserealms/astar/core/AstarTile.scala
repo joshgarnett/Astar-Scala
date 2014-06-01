@@ -23,8 +23,8 @@ THE SOFTWARE.
 package com.adverserealms.astar.core
 
 /**
- * AstarTile is a marker trait. Your classes have to implement this interface 
- * to be able to be used with the Astar class. Since this is a marker trait, 
+ * AstarTile is a marker trait. Your classes have to implement this interface
+ * to be able to be used with the Astar class. Since this is a marker trait,
  * no actual methods have to be implemented.
  */
 trait AstarTile {}

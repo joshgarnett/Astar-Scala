@@ -27,5 +27,5 @@ trait WalkableTile {
   /**
    * Returns if the tile is walkable or not
    */
-  def getWalkable() : Boolean
+  def getWalkable(): Boolean
 }

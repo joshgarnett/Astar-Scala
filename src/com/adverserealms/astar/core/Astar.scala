@@ -23,8 +23,7 @@ THE SOFTWARE.
 package com.adverserealms.astar.core
 
 import java.util.PriorityQueue
-import scala.collection.mutable.ListBuffer
-import scala.collection.mutable.HashMap
+import scala.collection.mutable._
 import org.slf4j.LoggerFactory
 import akka.actor.Actor._
 import akka.actor.Actor
@@ -34,26 +33,33 @@ import akka.dispatch.CompletableFuture
  * The main search algorithm and core class of the Astar library
  */
 class Astar extends Actor {
-  
+
+  /**
+   * This is the maximum number of Astar Tiles it'll check
+   */
+  private val MAX_CHECKS = 100000 //This number is the estimated maximum check for the 500*500 map.
+
   protected lazy val log = LoggerFactory.getLogger(getClass())
 
   /**
    * Used for mapping the DataTiles to the tiles given by the user
    */
-  private val dataTiles = new HashMap[AstarTile, DataTile]()
- 
+  private val dataTiles = new java.util.HashMap[AstarTile, DataTile](MAX_CHECKS)
+
   /**
    * The heap stores all the tiles in the open list
    */
   private val heap = new PriorityQueue[DataTile]()
-  
+
+  private val dataTilePool = new DataTilePool(MAX_CHECKS)
+
   /**
    * The PathRequest that is being processed
    */
-  private var currentRequest:AstarPathRequest = null
-  
+  private var currentRequest: AstarPathRequest = null
+
   def receive = {
-    case req:AstarPathRequest =>
+    case req: AstarPathRequest =>
       getPath(req)
     case _ =>
       log.error("Invalid message sent to Astar actor")
@@ -64,8 +70,7 @@ class Astar extends Actor {
    */
   private def getPath(request: AstarPathRequest) = {
     //clear any values in the dataTiles HashMap and the heap
-    dataTiles.clear()
-    heap.clear()
+    resetDataTiles()
 
     //check if the endpoint is valid
     var validPath = true
@@ -76,159 +81,174 @@ class Astar extends Actor {
         }
       }
     }
-    
-    if(!validPath) {
+
+    if (!validPath) {
       notifyListener(request, AstarPathError("The end tile is not a valid tile", request))
     }
     else {
       //set the request that is being processed
       currentRequest = request
-      
+
       val start = getDataTile(request.start)
       var end = getDataTile(request.end)
-      
+
       //open the starting tile and add it to the heap
       openTile(start, 0, null)
-      
-      var lastBestTile:DataTile = start;
-      var lastBestH:Float = start.getH;
-          
-      while(!heap.isEmpty && lastBestTile.getTarget != end.getTarget) {
+
+      var lastBestTile: DataTile = start;
+      var lastBestH: Double = start.getH;
+
+      while (!heap.isEmpty && lastBestTile.getTarget != end.getTarget && dataTiles.size < MAX_CHECKS) {
         val current = heap.poll()
-        
         //check if the destination has been reached
-        if(current.getTarget == end.getTarget) {
+        if (current.getTarget == end.getTarget) {
           lastBestTile = current
         }
         else {
           //close current tile
           current.setClosed()
-          
+
           //get surrounding neighbors
           val neighbors = getNeighbors(current)
-        
+
           //now inspect the neighbors
-          for(neighbor <- neighbors) {
-            if(!neighbor.isOpen) {
+          neighbors.foreach { neighbor =>
+            if (!neighbor.isOpen) {
               //add back to the heap
               neighbor.setDistance(currentRequest.map.getDistance(current.getTarget, neighbor.getTarget))
               openTile(neighbor, current.getG, current)
             }
             else {
               val newF = neighbor.calculateUpdateF(current.getG)
-              if(newF < neighbor.getF) {
+              if (newF < neighbor.getF) {
                 neighbor.setDistance(currentRequest.map.getDistance(current.getTarget, neighbor.getTarget))
-                
+
                 //remove and re-add the neighbor to adjust priority
                 heap.remove(neighbor)
                 openTile(neighbor, current.getG, current)
               }
             }
-            
+
             if (neighbor.getH < lastBestH) {
               lastBestTile = neighbor
-              lastBestH = neighbor.getH	
+              lastBestH = neighbor.getH
             }
           }
         }
       }
-      
+
       var partialPath = ((lastBestTile != end) && request.safeMode == Astar.PARTIAL_CHECK)
-      
-      val path:AstarPath = buildPath(start, lastBestTile)
-      
+
+      var path: AstarPath = null
+      if (partialPath || (lastBestTile == end)) {
+        path = buildPath(start, lastBestTile)
+      }
+      else {
+        path = new AstarPath(0, Nil)
+      }
+
       notifyListener(request, AstarPathResponse(partialPath, request, path, path.getPath.size))
-      
+
       //cleanup
-      dataTiles.clear()
-      heap.clear()
+      resetDataTiles()
     }
   }
-  
+
+  private def resetDataTiles() = {
+    val it = dataTiles.values().iterator()
+    while (it.hasNext()) {
+      val value = it.next()
+      dataTilePool.returnObject(value)
+    }
+    dataTiles.clear()
+    heap.clear()
+  }
+
   /**
    * Builds the path starting from the end and working its way back.
    */
-  private def buildPath(start:DataTile, end:DataTile) : AstarPath = {
+  private def buildPath(start: DataTile, end: DataTile): AstarPath = {
     val path = new ListBuffer[AstarTile]
-    
+
     var tile = end
-    
-    while(tile != start) {
+
+    while (tile != start) {
       path.prepend(tile.getTarget)
       tile = tile.getParent
     }
-    
-    new AstarPath(end.getF, path.toList) 
+
+    new AstarPath(end.getF, path.toList)
   }
-  
+
   /**
    * Returns all the neighbors of the specified tile. Each neighbor is passed through
    * the list of analyzers specified by the request.
    */
-  private def getNeighbors(dataTile:DataTile) : List[DataTile] = {
+  private def getNeighbors(dataTile: DataTile): ArrayBuffer[DataTile] = {
     var neighbors = getStandardNeighbors(dataTile)
-    
+
     //pass the list through each of the analyzers
-    for(analyzer <- currentRequest.analyzers) {
+    for (analyzer <- currentRequest.analyzers) {
       neighbors = analyzer.analyze(dataTile.getTarget, neighbors, currentRequest)
     }
-    
+
     neighbors
   }
-  
+
   /**
-   * Returns the standard neighbors of the tile, according to the source map's 
+   * Returns the standard neighbors of the tile, according to the source map's
    * getNeighbors method.
    */
-  private def getStandardNeighbors(dataTile:DataTile) : List[DataTile] = {
+  private def getStandardNeighbors(dataTile: DataTile): ArrayBuffer[DataTile] = {
     //the map determines which tiles are neighbors of the given tile
     val potentialNeighbors = currentRequest.map.getNeighbors(dataTile.getTarget)
-    
+
     //leave out all the tiles that are already closed
-    val neighbors = new ListBuffer[DataTile]
-    
-    for(tile <- potentialNeighbors) {
+    val neighbors = new ArrayBuffer[DataTile]
+
+    potentialNeighbors.foreach { tile =>
       val t = getDataTile(tile)
-      if(t != null && t.isOpen) {
+      if (t != null && t.isOpen) {
         neighbors += t
       }
     }
-    
-    neighbors.toList
+
+    neighbors
   }
-  
+
   /**
    * Gets the DataTile at the given location in the map.
    */
-  private def getDataTile(tile:AstarTile) : DataTile = {
-    if(dataTiles.contains(tile)) {
-      dataTiles.get(tile).get
-    }
-    else {
-      val dataTile = new DataTile(tile)
+  private def getDataTile(tile: AstarTile): DataTile = {
+    var dataTile = dataTiles.get(tile)
+
+    if (dataTile == null) {
+      dataTile = dataTilePool.borrowObject()
+      dataTile.setTarget(tile)
       dataTiles.put(tile, dataTile)
-      dataTile
     }
+
+    dataTile
   }
-  
+
   /**
-   * Opens a tile. The tile's position is set, it's added to the open list, the G and H 
+   * Opens a tile. The tile's position is set, it's added to the open list, the G and H
    * are set and the parent is set. Afterwards, the tile is added to the heap.
    */
-  private def openTile(tile:DataTile, g:Float, parent:DataTile)  = {
+  private def openTile(tile: DataTile, g: Double, parent: DataTile) = {
     tile.setOpen()
     tile.setG(g)
     tile.setH(currentRequest.map.getHeuristic(tile.getTarget, currentRequest))
     tile.setParent(parent)
     heap.add(tile)
   }
-  
+
   /**
    * Sends a response to the listener callback specified by the request.
    */
-  private def notifyListener(request:AstarPathRequest, value:Any) = {
+  private def notifyListener(request: AstarPathRequest, value: Any) = {
     request.listener(value)
-    
+
     try {
       //This is primarily for alerting futures that the request is complete
       self.senderFuture match {
@@ -242,36 +262,35 @@ class Astar extends Actor {
 }
 
 object Astar {
-  
+
   private val astarPool = actorOf[AstarPool].start
-  
+
   /**
    * If Astar.safeMode is set to NORMAL_CHECK, the end tile will be
    * validated with the analyzer.analyzeTile call.  Only the end
    * tile is checked.  It is assumed you start from a valid position.
    */
-  val NORMAL_CHECK:Int = 0
-  
-  
+  val NORMAL_CHECK: Int = 0
+
   /**
    * If Astar.safeMode is set to NO_CHECK, nothing will be checked
    * at the start of the search.
    */
-  val NO_CHECK:Int = 1
-  
+  val NO_CHECK: Int = 1
+
   /**
    * If Astar.safeMode is set to PARTIAL_CHECK, it will not check
    * the if the end point is valid but may do other checks and will
    * return a path even if the end point is not reached
    */
-  val PARTIAL_CHECK:Int = 2;
-  
+  val PARTIAL_CHECK: Int = 2;
+
   /**
    * Static method for finding an Astar path.  It will automatically
    * instantiate actors needed for asynchronous processing and will
    * clean them up.
    */
-  def getPath(path:AstarPathRequest) = {
+  def getPath(path: AstarPathRequest) = {
     astarPool ! path
   }
 }

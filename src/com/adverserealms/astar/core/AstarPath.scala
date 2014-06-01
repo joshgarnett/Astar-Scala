@@ -27,26 +27,26 @@ import com.adverserealms.astar.basic2d._
 /**
  * The AstarPath defines the path that is found by the Astar class.
  */
-class AstarPath(cost:Double, path:List[AstarTile]) {
+class AstarPath(cost: Double, path: List[AstarTile]) {
 
   /**
    * Gets the cost of this AstarPath
    */
   def getCost = cost
-  
+
   /**
    * Gets the path
    */
   def getPath = path
-  
-  override def toString() : String = {
+
+  override def toString(): String = {
     var value = ""
-      
-    for(tile <- path) {
+
+    for (tile <- path) {
       val point = tile.asInstanceOf[PositionTile].getPosition
-      value = value + point.getX+","+point.getY + " "
+      value = value + point.getX + "," + point.getY + " "
     }
-    
+
     value
   }
 }

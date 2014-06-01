@@ -24,6 +24,6 @@ package com.adverserealms.astar.basic2d
 
 trait PositionTile {
 
-  def getPosition() : Point
-  
+  def getPosition(): Point
+
 }

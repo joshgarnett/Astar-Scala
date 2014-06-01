@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 package com.adverserealms.astar.basic2d.analyzers
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 
 import com.adverserealms.astar.basic2d.WalkableTile
 import com.adverserealms.astar.core.Analyzer
@@ -31,13 +31,13 @@ import com.adverserealms.astar.core.AstarPathRequest
 import com.adverserealms.astar.core.DataTile
 
 /**
- * The WalkableAnalyzer eliminates tiles that aren't walkable. If ignoreEnd is 
+ * The WalkableAnalyzer eliminates tiles that aren't walkable. If ignoreEnd is
  * true, the end node (PathRequest.isTarget(tile)) doesn't have to be walkable
  */
-class WalkableAnalyzer(ignoreEnd:Boolean) extends Analyzer {
+class WalkableAnalyzer(ignoreEnd: Boolean) extends Analyzer {
 
-  def analyzeTile(mainTile:DataTile, request:AstarPathRequest) : Boolean = {
-    if(ignoreEnd && mainTile.getTarget == request.end) {
+  def analyzeTile(mainTile: DataTile, request: AstarPathRequest): Boolean = {
+    if (ignoreEnd && mainTile.getTarget == request.end) {
       true
     }
     else {
@@ -45,15 +45,15 @@ class WalkableAnalyzer(ignoreEnd:Boolean) extends Analyzer {
     }
   }
 
-  def analyze(mainTile:AstarTile, neighbors:List[DataTile], request:AstarPathRequest) : List[DataTile] = {
-    val walkableNeighbors = new ListBuffer[DataTile]
-    
-    for(tile <- neighbors) {
-      if(tile.getTarget.asInstanceOf[WalkableTile].getWalkable || (ignoreEnd && tile == request.end)) {
+  def analyze(mainTile: AstarTile, neighbors: ArrayBuffer[DataTile], request: AstarPathRequest): ArrayBuffer[DataTile] = {
+    val walkableNeighbors = new ArrayBuffer[DataTile]
+
+    neighbors.foreach { tile =>
+      if (tile.getTarget.asInstanceOf[WalkableTile].getWalkable || (ignoreEnd && tile == request.end)) {
         walkableNeighbors += tile
       }
     }
-    
-    walkableNeighbors.toList
+
+    walkableNeighbors
   }
 }
